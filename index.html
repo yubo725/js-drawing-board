@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Paint</title>
+	<style type="text/css">
+		canvas {
+			background-color: #ECECEC;
+			cursor: default;
+		}
+		.tool-bar {
+			margin-bottom: 10px;
+		}
+	</style>
+</head>
+<body>
+	<div class="tool-bar">
+		<button id="btn-line">画直线</button>
+		<button id="btn-rect">画矩形</button>
+		<button id="btn-oval">画圆形</button>
+		<button id="btn-clear">清空画布</button>
+		<span id="hint" style="color: red;">画直线</span>
+	</div>
+	<canvas id="canvas" width="800" height="600"></canvas>
+	<script type="text/javascript" src="js/require.min.js" data-main="js/main"></script>
+	<script type="text/javascript">
+		require(['app/point', 'app/line', 'app/rect', 'app/utils'], function(Point, Line, Rect, Utils) {
+			var canvas = document.getElementById("canvas");
+			var context = canvas.getContext('2d');
+			var rect = canvas.getBoundingClientRect();
+			canvas.addEventListener('mousedown', handleMouseDown);
+			canvas.addEventListener('mousemove', handleMouseMove);
+			canvas.addEventListener('mouseup', handleMouseUp);
+			bindClick('btn-clear', menuBtnClicked);
+			bindClick('btn-line', menuBtnClicked);
+			bindClick('btn-rect', menuBtnClicked);
+			bindClick('btn-oval', menuBtnClicked);
+
+			var mouseDown = false; 
+			var selection = 0; // 0, 1, 2分别代表画直线、画矩形、画圆
+			
+			var downPoint = new Point(0, 0),  
+				movePoint = new Point(0, 0), 
+				upPoint = new Point(0, 0);
+			var line;
+			var rect;
+
+			/** 处理鼠标按下的事件 */
+			function handleMouseDown(event) {
+				downPoint.x = event.clientX - rect.left;
+				downPoint.y = event.clientY - rect.top;
+				if(selection === 0) {
+					line = new Line(downPoint, downPoint);
+					line.startPoint = downPoint;
+				} else if(selection === 1) {
+					rect = new Rect(downPoint, 0, 0);
+				}
+				
+				mouseDown = true;
+			}
+
+			/** 处理鼠标移动的事件 */
+			function handleMouseMove(event) {
+				movePoint.x = event.clientX - rect.left;
+				movePoint.y = event.clientY - rect.top;
+				if(movePoint.x == downPoint.x && movePoint.y == downPoint.y) {
+					return ;
+				}
+				if(movePoint.x == upPoint.x && movePoint.y == upPoint.y) {
+					return ;
+				}
+				if(mouseDown) {
+					line.endPoint = movePoint;
+					clearCanvas();
+					Utils.drawLine(context, line);	
+					Utils.drawHistory(context);
+				}
+			}
+
+			/** 处理鼠标抬起的事件 */
+			function handleMouseUp(event) {
+				upPoint.x = event.clientX - rect.left;
+				upPoint.y = event.clientY - rect.top;
+				line.endPoint = upPoint;
+
+				if(mouseDown) {
+					mouseDown = false;
+					if(!downPoint.equals(upPoint)) {
+						Utils.addHistory(new Line(new Point(downPoint.x, downPoint.y), 
+							new Point(upPoint.x, upPoint.y)));	
+					}
+					clearCanvas();
+					Utils.drawHistory(context);
+				}
+			}
+
+			/** 清空画布 */
+			function clearCanvas() {
+				context.clearRect(0, 0, canvas.width, canvas.height);
+			}
+
+			/** 菜单按钮的点击事件处理 */
+			function menuBtnClicked(event) {
+				var domID = event.srcElement.id;
+				if(domID === 'btn-clear') {
+					clearCanvas();
+					Utils.clearHistory();
+				} else if(domID == 'btn-line') {
+					selection = 0;
+					showHint('画直线');
+				} else if(domID == 'btn-rect') {
+					selection = 1;
+					showHint('画矩形');
+				} else if(domID == 'btn-oval') {
+					selection = 2;
+					showHint('画圆形');
+				}
+			}
+
+			function showHint(msg) {
+				document.getElementById('hint').innerHTML = msg;
+			}
+
+			/** 给对应id的dom元素绑定点击事件 */
+			function bindClick(domID, handler) {
+				document.getElementById(domID).addEventListener('click', handler);
+			}
+		});
+	</script>
+</body>
+</html>
