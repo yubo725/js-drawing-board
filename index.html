@@ -49,13 +49,14 @@
 			function handleMouseDown(event) {
 				downPoint.x = event.clientX - rect.left;
 				downPoint.y = event.clientY - rect.top;
-				if(selection === 0) {
+				if(selection === 0) {  
+					log('mouse down, new line...');
 					line = new Line(downPoint, downPoint);
 					line.startPoint = downPoint;
 				} else if(selection === 1) {
+					log("mouse down, new rect...");
 					rect = new Rect(downPoint, 0, 0);
 				}
-				
 				mouseDown = true;
 			}
 
@@ -70,9 +71,17 @@
 					return ;
 				}
 				if(mouseDown) {
-					line.endPoint = movePoint;
 					clearCanvas();
-					Utils.drawLine(context, line);	
+					if(selection == 0) {
+						line.endPoint = movePoint;	
+						Utils.drawLine(context, line);
+						log('mouse move, draw line...');
+					} else if(selection == 1) {
+						rect.width = movePoint.x - downPoint.x;
+						rect.height = movePoint.y - downPoint.y;
+						Utils.drawRect(context, rect);
+						log("mouse move, draw rect...");
+					}
 					Utils.drawHistory(context);
 				}
 			}
@@ -81,13 +90,19 @@
 			function handleMouseUp(event) {
 				upPoint.x = event.clientX - rect.left;
 				upPoint.y = event.clientY - rect.top;
-				line.endPoint = upPoint;
 
 				if(mouseDown) {
 					mouseDown = false;
-					if(!downPoint.equals(upPoint)) {
-						Utils.addHistory(new Line(new Point(downPoint.x, downPoint.y), 
-							new Point(upPoint.x, upPoint.y)));	
+					if(selection == 0) {
+						line.endPoint = upPoint;	
+						if(!downPoint.equals(upPoint)) {
+							Utils.addHistory(new Line(new Point(downPoint.x, downPoint.y), 
+								new Point(upPoint.x, upPoint.y)));	
+						}	
+					} else if(selection == 1) {
+						rect.width = upPoint.x - downPoint.x;
+						rect.height = upPoint.y - downPoint.y;
+						Utils.addHistory(new Rect(new Point(downPoint.x, downPoint.y, rect.width, rect.height)));
 					}
 					clearCanvas();
 					Utils.drawHistory(context);
@@ -124,6 +139,10 @@
 			/** 给对应id的dom元素绑定点击事件 */
 			function bindClick(domID, handler) {
 				document.getElementById(domID).addEventListener('click', handler);
+			}
+
+			function log(msg) {
+				console.log(msg);
 			}
 		});
 	</script>

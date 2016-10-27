@@ -10,7 +10,7 @@ define(['app/line', 'app/rect'], function(Line, Rect) {
 	}
 
 	function drawHistory(context) {
-		for(var i = 0; i < lines.length; i++) {
+		for(var i = 0; i < history.length; i++) {
 			var obj = history[i];
 			obj.drawMe(context);			
 		}
@@ -21,12 +21,13 @@ define(['app/line', 'app/rect'], function(Line, Rect) {
 	}
 
 	function clearHistory() {
-		lines = [];
+		history = [];
 	}
 
 	return {
 		drawLine: drawLine,
-		addLine: addLine,
+		drawRect: drawRect,
+		addHistory: addHistory,
 		drawHistory: drawHistory,
 		clearHistory: clearHistory
 	};
