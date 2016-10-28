@@ -1,3 +1,4 @@
+/** 点 */
 define(function() {
 	return function(x, y) {
 		this.x = x;

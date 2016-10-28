@@ -1,3 +1,4 @@
+/** 矩形 */
 define(['app/point'], function() {
 	return function(startPoint, width, height) {
 		this.startPoint = startPoint;
