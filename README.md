@@ -3,3 +3,6 @@
 
 # 演示
 ![](https://github.com/yubo725/DrawingBoard/blob/master/GIF.gif)
+
+# 问题
+画圆形时需要鼠标从左上角拖到右下角，如果不是这样画圆，圆的位置会有问题
