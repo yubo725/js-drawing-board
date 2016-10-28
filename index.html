@@ -29,7 +29,7 @@
 
 			var canvas = document.getElementById("canvas");
 			var context = canvas.getContext('2d');
-			var canvasRect = canvas.getBoundingClientRect();
+			var canvasRect = canvas.getBoundingClientRect(); //得到canvas所在的矩形
 			canvas.addEventListener('mousedown', handleMouseDown);
 			canvas.addEventListener('mousemove', handleMouseMove);
 			canvas.addEventListener('mouseup', handleMouseUp);
